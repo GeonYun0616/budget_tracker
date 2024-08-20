@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html lang = 'en'>
+<html lang="en">
     <head>
-        <meta charset = 'UTF-8'>
-        <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0'>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dashboard</title>
-        <link rel = 'stylesheet' href = "{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     </head>
     <body>
-        <div class = 'container'>
+        <div class="container">
             <h1>Welcome to Your Dashboard</h1>
             <p>Total Expenses: ${{ total_expenses }}</p>
 
-            <h3> Your Expenses:</h3>
+            <h3>Your Expenses:</h3>
             <ul>
                 {% for expense in expenses %}
-                    <li>{{ expense,date }}: ${{ expense.amount }} - {{ expense.category }} ({{ expense.description }})</li>
+                    <li>{{ expense.date }}: ${{ expense.amount }} - {{ expense.category }} ({{ expense.description }})</li>
+                {% endfor %}
             </ul>
 
-            <a href = "{{ url_for('add_expense') }}">Add New Expense</a><br>
-            <a href = "{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('add_expense') }}">Add New Expense</a><br>
+            <a href="{{ url_for('logout') }}">Logout</a>
         </div>
     </body>
 </html>

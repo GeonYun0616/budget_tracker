@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request
 from app import app, db, bcrypt
-from app.models import User
+from app.models import User, Expense
 from flask_login import login_user, logout_user, current_user, login_required
 
 
@@ -66,3 +66,21 @@ def logout():
 @login_required
 def dashboard():
     return render_template('dashboard.html')
+
+@app.route('/add_expense', methods = ['GET', 'POST'])
+@login_required
+def add_expense():
+    if request.method == 'POST':
+        amount = request.form['amount']
+        category = request.form['category']
+        description = request.form['description']
+        date = request.form['date']
+
+        expense = Expense(amount = amount, category = category, description = description, date = date, user_id = current_user.id)
+        db.session.add(expense)
+        db.session.commit()
+
+        flash('Expense added', 'success')
+        return redirect(url_for('dashboard'))
+    
+    return render_template('add_expense.html')
