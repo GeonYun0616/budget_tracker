@@ -3,6 +3,13 @@ from app import app, db, bcrypt
 from app.models import User
 from flask_login import login_user, logout_user, current_user, login_required
 
+
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
     if request.method == 'POST':
