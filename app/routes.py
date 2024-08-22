@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, Response
 from app import app, db, bcrypt
-from app.models import User, Expense
+from app.models import User, Expense, Budget, convert_currency
 from flask_login import login_user, logout_user, current_user, login_required
 from datetime import datetime, timedelta
 
@@ -77,9 +77,24 @@ def dashboard():
 
     expenses = Expense.query.filter_by(user_id = current_user.id).all()
     total_expenses = sum(expense.amount for expense in expenses)
+    for expense in expenses:
+        converted_amount = convert_currency(expense.amount, expense.currency, 'USD')
+        total_expenses += converted_amount
+
+    budgets = Budget.query.filter_by(user_id = current_user.id).all()
+    budget_summary = []
+
+    for budget in budgets:
+        spent = sum(expense.amount for expense in expenses if expense.category == budget.category and budget.start_date <= expense.date <= budget.end_date)
+        budget_summary.append({
+            'category': budget.category,
+            'amount': budget.amount,
+            'spent': spent,
+            'remaining': budget.amount - spent
+        })
 
     expense_graph_data = expense_graph(week_offset = week_offset)
-    return render_template('dashboard.html', expenses = expenses, total_expenses = total_expenses, expense_graph_data = expense_graph_data)
+    return render_template('dashboard.html', expenses = expenses, total_expenses = total_expenses, expense_graph_data = expense_graph_data, budget_summary = budget_summary)
 
 @app.route('/add_expense', methods = ['GET', 'POST'])
 @login_required
@@ -172,3 +187,20 @@ def delete_expense(expense_id):
 def manage_expenses():
     expenses = Expense.query.filter_by(user_id = current_user.id).all()
     return render_template('manage_expenses.html', expenses = expenses)
+
+@app.route('/set_budget', methods = ['GET', 'POST'])
+@login_required
+def set_budget():
+    if request.method == 'POST':
+        amount = request.form['amount']
+        category = request.form['category'].capitalize()
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+
+        budget = Budget(amount = amount, category = category, start_date = start_date, end_date = end_date, user_id = current_user.id)
+        db.session.add(budget)
+
+        flash('Budget set successfully!', 'success')
+        return redirect(url_for('dashboard'))
+    
+    return render_template('set_budget.html')

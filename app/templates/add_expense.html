@@ -22,6 +22,17 @@
                 <label for = 'date'>Date:</label>
                 <input type = 'date' id = 'date' name = 'date' required><br>
 
+                <label for="currency">Currency:</label>
+                <select id="currency" name="currency" required>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                    <option value="JPY">JPY</option>
+                    <option value="KRW">KRW</option>
+                    <option value="RMB">RMB</option>
+                    <option value="AUD">AUD</option>
+                </select>
+
                 <button type = 'submit'>Add Expense</button>
             </form>
             <a href = "{{ url_for('dashboard') }}">Back to Dashboard</a>
