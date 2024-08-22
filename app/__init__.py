@@ -13,4 +13,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 bcrypt = Bcrypt(app)
 
-from app import routes, models
+from app import routes, models, db
+
+with app.app_context():
+    db.create_all()
